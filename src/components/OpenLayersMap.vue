@@ -1,34 +1,54 @@
 <template>
-  <div ref="root"/>
+  <div class="map" ref="root"/>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import Map from 'ol/map';
 import View from 'ol/view';
+import BaseLayer from 'ol/layer/base';
 import TileLayer from 'ol/layer/tile';
+import VectorLayer from 'ol/layer/vector';
+import KMLFormat from 'ol/format/kml';
 import OSMSource from 'ol/source/osm';
+import VectorSource from 'ol/source/vector';
+import Proj from 'ol/proj';
+import { mapState } from 'vuex';
+import { State } from '../store';
+import Collection from 'ol/collection';
 
-// require('ol/ol.css');
 import 'ol/ol.css';
 
-@Component
+@Component({
+  computed: mapState<State>({
+    files: state => state.files
+  })
+})
 export default class OpenLayersMap extends Vue {
   private map?: Map;
 
   public mounted() {
-    this.map = new Map({
+    const projection = Proj.get('EPSG:3857');
+
+    const base = new TileLayer({
+      source: new OSMSource()
+    });
+
+    const map = new Map({
       target: this.$refs.root as Element,
       view: new View({
         center: [0, 0],
-        zoom: 1
+        zoom: 2,
+        projection
       }),
-      layers: [
-        new TileLayer({
-          source: new OSMSource()
-        })
-      ]
+      layers: [base]
     });
+
+    this.map = map;
+
+    // map.getView().on('change', event => {
+    //   console.log('change', event.target.getCenter(), event.target.getZoom());
+    // });
   }
 
   public unmounted() {
@@ -37,5 +57,44 @@ export default class OpenLayersMap extends Vue {
       this.map = undefined;
     }
   }
+
+  @Watch('files')
+  public onFileChanged(files?: File[]) {
+    if (!this.map) {
+      return;
+    }
+
+    const group = this.map.getLayerGroup();
+    const base = group.getLayers().item(0);
+    const layers = [base, ...this.buildLayersFromFiles(files)];
+
+    group.setLayers(new Collection(layers));
+  }
+
+  private buildLayersFromFiles(files?: File[]): BaseLayer[] {
+    if (!files) {
+      return [];
+    }
+
+    const layers: BaseLayer[] = [];
+    const format = new KMLFormat();
+
+    for (const file of files) {
+      const source = new VectorSource({
+        url: URL.createObjectURL(file),
+        format
+      });
+
+      layers.push(new VectorLayer({ source }));
+    }
+
+    return layers;
+  }
 }
 </script>
+
+<style scoped>
+.map {
+  width: 100%;
+}
+</style>

@@ -1,32 +1,31 @@
 <template>
   <div id="app">
-    <OpenLayersMap/>
+    <Home/>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
-import OpenLayersMap from './components/OpenLayersMap.vue';
+import Home from './components/Home.vue';
 
 import 'normalize.css';
 
 @Component({
   components: {
-    HelloWorld,
-    OpenLayersMap
+    Home
   }
 })
 export default class App extends Vue {}
 </script>
 
 <style>
+html,
+body {
+  height: 100%;
+}
+
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  font-family: Helvetica, Arial, sans-serif;
+  height: 100%;
 }
 </style>
