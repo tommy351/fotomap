@@ -7,88 +7,80 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import Map from 'ol/map';
 import View from 'ol/view';
 import BaseLayer from 'ol/layer/base';
-import TileLayer from 'ol/layer/tile';
-import VectorLayer from 'ol/layer/vector';
-import KMLFormat from 'ol/format/kml';
-import OSMSource from 'ol/source/osm';
-import VectorSource from 'ol/source/vector';
-import Proj from 'ol/proj';
-import { mapState } from 'vuex';
 import Collection from 'ol/collection';
-import { getKMLFiles } from '../store/kml';
+import OLEvent from 'ol/events/event';
+import Observable from 'ol/observable';
+import {
+  getMapLayers,
+  getMapCenter,
+  setMapCenter,
+  setMapZoom,
+  getMapZoom,
+  getMapRotation,
+  setMapRotation
+} from '../store/map';
 
 import 'ol/ol.css';
 
 @Component
 export default class OpenLayersMap extends Vue {
   private map?: Map;
+  private moveEndListener?: any;
 
   public mounted() {
-    const projection = Proj.get('EPSG:3857');
-
-    const base = new TileLayer({
-      source: new OSMSource()
-    });
-
     const map = new Map({
       target: this.$refs.root as Element,
       view: new View({
-        center: [0, 0],
-        zoom: 2,
-        projection
+        center: this.center,
+        zoom: this.zoom,
+        rotation: this.rotation
       }),
-      layers: [base]
+      layers: this.layers
     });
 
     this.map = map;
-
-    // map.getView().on('change', event => {
-    //   console.log('change', event.target.getCenter(), event.target.getZoom());
-    // });
+    this.moveEndListener = map.on('moveend', this.onMapMoveEnd);
   }
 
   public unmounted() {
     if (this.map) {
+      Observable.unByKey(this.moveEndListener);
       this.map.setTarget(null as any);
       this.map = undefined;
     }
   }
 
-  public get files() {
-    return getKMLFiles(this.$store);
+  public get layers() {
+    return getMapLayers(this.$store);
   }
 
-  @Watch('files')
-  public onFileChanged(files?: File[]) {
+  public get center() {
+    return getMapCenter(this.$store);
+  }
+
+  public get zoom() {
+    return getMapZoom(this.$store);
+  }
+
+  public get rotation() {
+    return getMapRotation(this.$store);
+  }
+
+  @Watch('layers')
+  public onLayersChanged(layers: BaseLayer[]) {
     if (!this.map) {
       return;
     }
 
-    const group = this.map.getLayerGroup();
-    const base = group.getLayers().item(0);
-    const layers = [base, ...this.buildLayersFromFiles(files)];
-
-    group.setLayers(new Collection(layers));
+    this.map.getLayerGroup().setLayers(new Collection(layers));
   }
 
-  private buildLayersFromFiles(files?: File[]): BaseLayer[] {
-    if (!files) {
-      return [];
-    }
+  public onMapMoveEnd(event: OLEvent) {
+    const view = event.target.getView();
 
-    const layers: BaseLayer[] = [];
-    const format = new KMLFormat();
-
-    for (const file of files) {
-      const source = new VectorSource({
-        url: URL.createObjectURL(file),
-        format
-      });
-
-      layers.push(new VectorLayer({ source }));
-    }
-
-    return layers;
+    setMapCenter(this.$store, view.getCenter());
+    setMapZoom(this.$store, view.getZoom());
+    setMapRotation(this.$store, view.getRotation());
   }
 }
 </script>

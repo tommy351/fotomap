@@ -33,6 +33,7 @@ export default class Home extends Vue {}
 
 .map {
   flex-grow: 1;
+  flex-shrink: 0;
   height: 100%;
 }
 

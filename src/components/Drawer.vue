@@ -1,32 +1,27 @@
 <template>
-  <aside>
-    <form @submit="onSubmit">
-      <div>
-      <label>
-        <span>Load KML file</span>
-        <input type="file" multiple @change="onFileChanged"/>
-      </label>
-      </div>
-      <button type="submit">Load</button>
-    </form>
+  <aside class="drawer">
+    <KMLLoader/>
+    <SourceList/>
   </aside>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { loadKMLFiles } from '../store/kml';
+import KMLLoader from './KMLLoader.vue';
+import SourceList from './SourceList.vue';
 
-@Component
-export default class Drawer extends Vue {
-  private files?: FileList;
-
-  public onSubmit(e: any) {
-    e.preventDefault();
-    loadKMLFiles(this.$store, Array.from(this.files as any));
+@Component({
+  components: {
+    KMLLoader,
+    SourceList
   }
-
-  public onFileChanged(e: any) {
-    this.files = e.target.files;
-  }
-}
+})
+export default class Drawer extends Vue {}
 </script>
+
+<style scoped>
+.drawer {
+  height: 100%;
+  overflow: auto;
+}
+</style>

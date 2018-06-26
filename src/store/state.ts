@@ -1,5 +1,5 @@
-import { KMLState } from './kml/state';
+import { MapState } from './map/state';
 
 export interface State {
-  kml: KMLState;
+  map: MapState;
 }
