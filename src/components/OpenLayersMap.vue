@@ -14,16 +14,12 @@ import OSMSource from 'ol/source/osm';
 import VectorSource from 'ol/source/vector';
 import Proj from 'ol/proj';
 import { mapState } from 'vuex';
-import { State } from '../store';
 import Collection from 'ol/collection';
+import { getKMLFiles } from '../store/kml';
 
 import 'ol/ol.css';
 
-@Component({
-  computed: mapState<State>({
-    files: state => state.files
-  })
-})
+@Component
 export default class OpenLayersMap extends Vue {
   private map?: Map;
 
@@ -56,6 +52,10 @@ export default class OpenLayersMap extends Vue {
       this.map.setTarget(null as any);
       this.map = undefined;
     }
+  }
+
+  public get files() {
+    return getKMLFiles(this.$store);
   }
 
   @Watch('files')

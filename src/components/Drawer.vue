@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { loadKMLFiles } from '../store/kml';
 
 @Component
 export default class Drawer extends Vue {
@@ -21,7 +22,7 @@ export default class Drawer extends Vue {
 
   public onSubmit(e: any) {
     e.preventDefault();
-    this.$store.commit('changeFiles', Array.from(this.files as any));
+    loadKMLFiles(this.$store, Array.from(this.files as any));
   }
 
   public onFileChanged(e: any) {
