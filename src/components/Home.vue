@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <div class="map">
-      <OpenLayersMap/>
-    </div>
     <div class="drawer">
       <Drawer/>
+    </div>
+    <div class="map">
+      <OpenLayersMap/>
     </div>
   </div>
 </template>
@@ -25,19 +25,20 @@ export default class Home extends Vue {}
 
 <style scoped>
 .container {
+  --accent-color: orange;
+
   height: 100%;
   display: flex;
-  flex-direction: row-reverse;
   position: relative;
 }
 
-.map {
-  flex-grow: 1;
-  flex-shrink: 0;
+.drawer {
   height: 100%;
+  width: 300px;
+  flex-shrink: 0;
 }
 
-.drawer {
+.map {
   height: 100%;
 }
 </style>

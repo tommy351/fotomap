@@ -1,4 +1,3 @@
-import BaseLayer from 'ol/layer/base';
 import { MapState } from './state';
 import { getStoreAccessors } from 'vuex-typescript';
 import { State as RootState } from '../state';
@@ -49,14 +48,19 @@ export const map = {
   },
 
   mutations: {
-    setMapSourcesFromKMLFiles(state: MapState, files: File[]) {
-      state.sources = files.map(
-        file =>
-          new VectorSource({
-            url: URL.createObjectURL(file),
-            format: kmlFormat
-          })
-      );
+    addMapSourcesFromKMLFiles(state: MapState, files: File[]) {
+      const sources = files.map(file => {
+        const source = new VectorSource({
+          url: URL.createObjectURL(file),
+          format: kmlFormat
+        });
+
+        source.set('filename', file.name);
+
+        return source;
+      });
+
+      state.sources = [...state.sources, ...sources];
     },
 
     setMapCenter(state: MapState, center: [number, number]) {
@@ -69,6 +73,10 @@ export const map = {
 
     setMapRotation(state: MapState, rotation: number) {
       state.rotation = rotation;
+    },
+
+    removeMapSource(state: MapState, index: any) {
+      state.sources.splice(index, 1);
     }
   }
 };
@@ -83,9 +91,10 @@ export const getMapCenter = read(map.getters.getMapCenter);
 export const getMapZoom = read(map.getters.getMapZoom);
 export const getMapRotation = read(map.getters.getMapRotation);
 
-export const setMapSourcesFromKMLFile = commit(
-  map.mutations.setMapSourcesFromKMLFiles
+export const addMapSourcesFromKMLFiles = commit(
+  map.mutations.addMapSourcesFromKMLFiles
 );
 export const setMapCenter = commit(map.mutations.setMapCenter);
 export const setMapZoom = commit(map.mutations.setMapZoom);
 export const setMapRotation = commit(map.mutations.setMapRotation);
+export const removeMapSource = commit(map.mutations.removeMapSource);
