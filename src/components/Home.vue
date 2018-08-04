@@ -1,9 +1,9 @@
 <template>
-  <div class="container">
-    <div class="drawer">
+  <div class="home">
+    <div class="home-drawer">
       <Drawer/>
     </div>
-    <div class="map">
+    <div class="home-map">
       <OpenLayersMap/>
     </div>
   </div>
@@ -24,21 +24,21 @@ export default class Home extends Vue {}
 </script>
 
 <style scoped>
-.container {
+.home {
   --accent-color: orange;
-
   height: 100%;
   display: flex;
   position: relative;
 }
 
-.drawer {
+.home-drawer {
   height: 100%;
   width: 300px;
   flex-shrink: 0;
 }
 
-.map {
+.home-map {
   height: 100%;
+  width: 100%;
 }
 </style>

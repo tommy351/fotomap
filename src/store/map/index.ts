@@ -76,7 +76,11 @@ export const map = {
     },
 
     removeMapSource(state: MapState, index: any) {
-      state.sources.splice(index, 1);
+      const removed = state.sources.splice(index, 1);
+
+      for (const src of removed) {
+        URL.revokeObjectURL(src.getUrl() as string);
+      }
     }
   }
 };

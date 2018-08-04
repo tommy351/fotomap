@@ -1,5 +1,5 @@
 <template>
-  <div class="map" ref="root"/>
+  <div class="map-root" ref="root"/>
 </template>
 
 <script lang="ts">
@@ -86,7 +86,8 @@ export default class OpenLayersMap extends Vue {
 </script>
 
 <style scoped>
-.map {
+.map-root {
   width: 100%;
+  height: 100%;
 }
 </style>
